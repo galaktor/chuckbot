@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -87,6 +88,6 @@ func getQuote() {
 			fmt.Printf("ERROR: %v\n", err)
 		}
 		resp.Body.Close()
-		j <- quote.Value.Joke
+		j <- html.UnescapeString(quote.Value.Joke)
 	}
 }
