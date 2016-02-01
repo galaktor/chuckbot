@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/thoj/go-ircevent"
 )
@@ -24,7 +25,7 @@ func init() {
 	flag.StringVar(&server, "server", "", "the <server-ip>:<port> to connect to")
 
 	flag.Parse()
-	
+
 	if server == "" {
 		panic("no server defined. use flag '-server <host>:<port>' to set it.")
 	}
@@ -47,7 +48,12 @@ func main() {
 	defer con.Quit()
 
 	con.AddCallback("001", func(e *irc.Event) { con.Join(channel) })
-	con.AddCallback("PRIVMSG", func(e *irc.Event) { con.Privmsg(e.Arguments[0], fmt.Sprintf("Apropos, %s: %s", e.Nick, <-j)) })
+	con.AddCallback("PRIVMSG", func(e *irc.Event) {
+		// only talk when prompted
+		if strings.Contains(strings.ToLower(e.Message()), strings.ToLower(nick)) {
+			con.Privmsg(e.Arguments[0], fmt.Sprintf("Apropos, %s: %s", e.Nick, <-j))
+		}
+	})
 
 	go getQuote()
 	con.Loop()
